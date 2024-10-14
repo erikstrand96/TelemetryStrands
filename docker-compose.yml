@@ -1,19 +1,17 @@
 services:
-  
+
   otel-collector:
     image: otel/opentelemetry-collector:latest
-    command: [ "--config=/etc/otel-collector-config.yaml" ]
+    command: [ "--config=/etc/otel-config.yaml" ]
     volumes:
-      - ./config/otel-collector-config.yaml:/etc/otel-collector-config.yaml
+      - ./config/otel-config.yaml:/etc/otel-config.yaml
     ports:
-      - "8888:8888"
-      - "8889:8889"
-      - "13133:13133"
       - "4317:4317"
+      - "4318:4318"
     networks:
       - monitoring
     restart: unless-stopped
-  
+
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
@@ -27,16 +25,17 @@ services:
     restart: unless-stopped
     networks:
       - monitoring
-  
+
   loki:
     image: grafana/loki:latest
     ports:
       - "3100:3100"
-    command: -config.file=/etc/loki/local-config.yaml
+    command:
+      - '-config.file=/etc/loki/local-config.yaml'
     networks:
       - monitoring
     restart: unless-stopped
-  
+
   promtail:
     image: grafana/promtail:latest
     volumes:
@@ -44,7 +43,7 @@ services:
     command: -config.file=/etc/promtail/config.yml
     networks:
       - monitoring
-  
+
   grafana:
     environment:
       - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
@@ -67,23 +66,25 @@ services:
           isDefault: true
           version: 1
           editable: false
-        
+
         - name: Prometheus
           type: prometheus
           url: http://prometheus:9090
           isDefault: false
           access: proxy
-          editable: true
+          editable: false
         EOF
         /run.sh
     image: grafana/grafana:latest
     ports:
       - "3000:3000"
+    restart: unless-stopped
     networks:
       - monitoring
 
 networks:
   monitoring:
+
 
 volumes:
   prometheus-data:
