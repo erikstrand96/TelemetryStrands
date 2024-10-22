@@ -3,9 +3,9 @@ receivers:
   otlp:
     protocols:
       grpc:
-        endpoint: localhost:4317
+        endpoint: 0.0.0.0:4317
       http:
-        endpoint: localhost:4318
+        endpoint: 0.0.0.0:4318
 
 # Processors
 processors:
@@ -13,10 +13,8 @@ processors:
 
 # Exporters
 exporters:
-  otlphttp/logs:
-    endpoint: "http://loki:3100/otlp"
-    tls:
-      insecure: true
+  otlphttp:
+    endpoint: http://loki:3100/otlp
   debug:
     verbosity: detailed
 
@@ -26,8 +24,4 @@ service:
     logs:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlphttp/logs]
-    metrics:
-      receivers: [otlp]
-      processors: [batch]
-      exporters: [debug]
+      exporters: [otlphttp]
