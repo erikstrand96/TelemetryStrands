@@ -1,11 +1,10 @@
 services:
 
   otel-collector:
-    image: otel/opentelemetry-collector:latest
+    image: otel/opentelemetry-collector:0.111.0
     command: [ "--config=/etc/otel-config.yaml" ]
     volumes:
       - ./config/otel-config.yaml:/etc/otel-config.yaml
-    #command: '--config=/etc/otelcol/config.yaml'
     ports:
       - "4317:4317"
       - "4318:4318"
@@ -14,12 +13,13 @@ services:
     restart: unless-stopped
 
   prometheus:
-    image: prom/prometheus:latest
+    image: prom/prometheus:v2.55.0
     container_name: prometheus
     ports:
       - "9090:9090"
     command:
       - '--config.file=/etc/prometheus/prometheus.yaml'
+      - '--enable-feature=otlp-write-receiver'
     volumes:
       - ./config/prometheus.yml:/etc/prometheus/prometheus.yaml
       - prometheus-data:/prometheus
